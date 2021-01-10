@@ -27,12 +27,19 @@ import curryN from './curryN.js';
  *      mapIndexed((val, idx) => idx + '-' + val, ['f', 'o', 'o', 'b', 'a', 'r']);
  *      //=> ['0-f', '1-o', '2-o', '3-b', '4-a', '5-r']
  */
+
 var addIndex = _curry1(function addIndex(fn) {
   return curryN(fn.length, function() {
     var idx = 0;
     var origFn = arguments[0];
     var list = arguments[arguments.length - 1];
     var args = Array.prototype.slice.call(arguments, 0);
+    // 重写 fn 的 处理函数
+    // 当执行 fn 的时候，如果是队列表遍历，则在 遍历处理函数 里面添加对应的 index
+    /**
+     * 举例 R.map(fn, list)  fn执行时的参数里面没有 index，而经过 R.addIndex(R.map)
+     * 处理过后的map，更加接近 原生的 Array.prototype.map
+     */
     args[0] = function() {
       var result = origFn.apply(this, _concat(arguments, [idx, list]));
       idx += 1;
